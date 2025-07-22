@@ -321,6 +321,105 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities }) => {
         </div>
       </div>
 
+      {/* MAIN ATTRACTION: World Map Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* World Map - Takes 2 columns for maximum impact */}
+        <div className="lg:col-span-2">
+          <WorldMap 
+            activities={displayActivities} 
+            className="h-full"
+          />
+        </div>
+
+        {/* Threat Summary Panel */}
+        <div className="space-y-4">
+          {/* Real-time Threat Stats */}
+          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover-lift transition-all duration-300 animate-fadeIn">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+                <AlertIcon size={20} color="#EF4444" />
+                <span>Live Threats</span>
+              </h3>
+              <div className="flex items-center space-x-2">
+                <PulseIcon size={8} color="#EF4444" animate={true} />
+                <span className="text-xs text-gray-400">Active</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              {displayActivities
+                .filter(activity => activity.status === 'high')
+                .slice(0, 3)
+                .map((activity, index) => (
+                  <div key={activity.id} className="bg-red-900 bg-opacity-50 p-3 rounded-lg border border-red-700">
+                    <div className="flex items-center justify-between">
+                      <span className="text-red-200 text-sm font-medium">{activity.country}</span>
+                      <span className="text-red-400 text-xs">{activity.ip_address}</span>
+                    </div>
+                    <p className="text-gray-300 text-xs mt-1">{activity.message}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-gray-400">
+                        {new Date(activity.timestamp).toLocaleTimeString()}
+                      </span>
+                      <span className="text-red-400 text-xs font-bold">
+                        Score: {activity.threat_score}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              
+              {displayActivities.filter(a => a.status === 'high').length === 0 && (
+                <div className="text-center py-4">
+                  <ShieldIcon size={32} color="#10B981" className="mx-auto mb-2" />
+                  <p className="text-green-400 text-sm">No critical threats</p>
+                  <p className="text-gray-500 text-xs">System secure</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Geographic Distribution */}
+          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover-lift transition-all duration-300 animate-fadeIn">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+              <NetworkIcon size={20} color="#3B82F6" />
+              <span>Geographic Intel</span>
+            </h3>
+            
+            <div className="space-y-2">
+              {Object.entries(
+                displayActivities.reduce((acc: { [key: string]: number }, activity) => {
+                  if (activity.country) {
+                    acc[activity.country] = (acc[activity.country] || 0) + 1;
+                  }
+                  return acc;
+                }, {})
+              )
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([country, count], index) => (
+                  <div key={country} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                    <span className="text-white text-sm">{country}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-16 bg-gray-600 rounded-full h-2">
+                        <div 
+                          className="bg-blue-400 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${(count / Math.max(...Object.values(displayActivities.reduce((acc: { [key: string]: number }, activity) => {
+                            if (activity.country) {
+                              acc[activity.country] = (acc[activity.country] || 0) + 1;
+                            }
+                            return acc;
+                          }, {})))) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-blue-400 text-sm font-semibold">{count}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Threat Trends Chart */}
