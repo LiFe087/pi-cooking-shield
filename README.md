@@ -1,5 +1,5 @@
-# 🛡️ PI-Cooking-Shield
-*"Cooking up cybersecurity, one threat at a time"*
+# 🛡️ SentinelPi
+*"Smart Security at the Edge"*
 
 [![Status](https://img.shields.io/badge/Status-In%20Development-yellow)]()
 [![License](https://img.shields.io/badge/License-MIT-blue)]()
@@ -11,7 +11,7 @@
 
 ## 🎯 **PROJECT OVERVIEW**
 
-**PI-Cooking-Shield** is an enterprise-grade distributed cybersecurity system designed for Small and Medium Enterprises (SMEs). The system transforms legacy network infrastructure into a modern AI-powered threat detection platform using edge computing and machine learning.
+**SentinelPi** is an enterprise-grade distributed cybersecurity system designed for Small and Medium Enterprises (SMEs). The system transforms legacy network infrastructure into a modern AI-powered threat detection platform using edge computing and machine learning.
 
 ### **🏆 Key Value Proposition**
 - **Cost-Effective**: $200 hardware vs $20,000+ enterprise solutions
@@ -30,7 +30,7 @@
 ### 📊 **OFFICIAL PROJECT DESCRIPTION** *(For Professors/Presentations)*
 
 ```yaml
-Project Title: "Distributed Cybersecurity System with AI-Powered Threat Detection"
+Project Title: "SentinelPi: Distributed Cybersecurity System with AI-Powered Threat Detection"
 
 Architecture: "Enterprise microservices with real-time analytics"
 Frontend: "Modern web application with advanced visualization"
@@ -44,7 +44,7 @@ Integration: "Enterprise-grade log analysis platform"
 ### 🛠️ **ACTUAL TECHNICAL IMPLEMENTATION** *(2-Man Army Reality)*
 
 ```yaml
-What We Actually Built: "Functional prototype with professional appearance"
+What We Actually Built: "SentinelPi functional prototype with professional appearance"
 
 Architecture: React SPA + Flask API + Simple ML on edge devices
 Frontend: React + TypeScript + Tailwind CSS (looks enterprise-grade)
@@ -154,8 +154,8 @@ Performance: <500ms response time
 
 ### **🏆 Enterprise Solutions We "Compete" With**
 
-| Feature | Splunk | QRadar | Elastic SIEM | **PI-Cooking-Shield** |
-|---------|--------|---------|--------------|----------------------|
+| Feature | Splunk | QRadar | Elastic SIEM | **SentinelPi** |
+|---------|--------|---------|--------------|----------------|
 | **Cost/Month** | $2000+ | $4000+ | $1500+ | **$0** |
 | **Setup Time** | 3-6 months | 6-12 months | 2-4 months | **2 hours** |
 | **Hardware Req** | Enterprise servers | IBM hardware | Cloud/cluster | **$200 edge devices** |
@@ -563,11 +563,11 @@ System Hardening:
 
 ---
 
-*¡Gracias por usar PI-Cooking-Shield! Tu feedback y contribuciones ayudan a mejorar la ciberseguridad para todos.*
+*¡Gracias por usar SentinelPi! Tu feedback y contribuciones ayudan a mejorar la ciberseguridad para todos.*
 
-*🍳 Cooking up cybersecurity, one threat at a time! 🛡️*
+*🍳 Smart Security at the Edge! 🛡️*
 
-**PI-Cooking-Shield v2.5** - Professional distributed cybersecurity for the modern age.
+**SentinelPi v2.5** - Professional distributed cybersecurity for the modern age.
 
 ---
 
