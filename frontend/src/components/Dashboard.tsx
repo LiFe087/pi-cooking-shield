@@ -1,4 +1,4 @@
-// src/components/Dashboard.tsx - UPDATED: Real Backend Integration
+// src/components/Dashboard.tsx - ACTUALIZADO: Integración Real con Backend
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
@@ -22,14 +22,14 @@ const Toast: React.FC<{ message: string; onClose: () => void }> = ({ message, on
   }, [onClose]);
   return createPortal(
     <div className="fixed top-6 right-6 z-50 bg-red-700 text-white px-6 py-3 rounded shadow-lg animate-bounce">
-      <span className="font-bold">¡Alerta!</span> {message}
+      <span className="font-bold">Alert!</span> {message}
     </div>,
     document.body
   );
 };
 
-// Interfaces definidas aquí
-interface SystemStats {
+  // Interfaces defined here
+  interface SystemStats {
   threats_detected: number;
   network_status: string;
   logs_per_minute: number;
@@ -49,34 +49,34 @@ interface Activity {
   timestamp: string;
   source: string;
   
-  // Campos de amenaza
+  // Threat fields
   threat_score: number;
   status: string;
   alert_level: string;
   
-  // Información de dispositivo origen
+  // Source device information
   device_name?: string;
   device_type?: string;
   os_name?: string;
   device_category?: string;
   src_mac?: string;
   
-  // IPs y países
+  // IPs and countries
   src_ip?: string;
   dst_ip?: string;
   src_country?: string;
   dst_country?: string;
   
-  // Puertos y servicio
+  // Ports and service
   src_port?: string;
   dst_port?: string;
   service?: string;
   
-  // Protocolo y acción
+  // Protocol and action
   protocol?: string;
   action?: string;
   
-  // Interfaces y política
+  // Interfaces and policy
   src_interface?: string;
   dst_interface?: string;
   src_interface_role?: string;
@@ -84,7 +84,7 @@ interface Activity {
   policy_id?: string;
   policy_type?: string;
   
-  // Estadísticas de tráfico
+  // Traffic statistics
   bytes_sent?: string;
   bytes_received?: string;
   packets_sent?: string;
@@ -119,23 +119,23 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [filters, setFilters] = useState<SearchFilter[]>([]);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  // Estado para actividades recientes en tiempo real
+  // State for real-time recent activities
   const [liveActivities, setLiveActivities] = useState<Activity[]>(activities.slice(0, 5));
-  // Fallback para saber si ya se intentó fetch
+  // Fallback to know if fetch was already attempted
   const [fetchTried, setFetchTried] = useState(false);
-  // Estado para notificaciones toast
+  // State for toast notifications
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  // Estado para modal de detalles
+  // State for details modal
   const [modalActivity, setModalActivity] = useState<Activity | null>(null);
-  // Estado para filtro rápido de severidad
+  // State for quick severity filter
   const [severityFilter, setSeverityFilter] = useState<string>('');
-  // Estado para paginación
+  // State for pagination
   const [page, setPage] = useState(1);
   const pageSize = 5;
-  // Estado para WebSocket
+  // State for WebSocket
   const [wsConnected, setWsConnected] = useState(false);
 
-  // WebSocket para actividades recientes (con fallback a polling)
+  // WebSocket for recent activities (with polling fallback)
   useEffect(() => {
     let lastHighId = liveActivities.length > 0 ? liveActivities[0].id : null;
     let ws: WebSocket | null = null;
@@ -144,10 +144,10 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
 
     function handleNewActivities(data: Activity[]) {
       setLiveActivities(data);
-      // Notificación si hay amenaza alta nueva
+      // Notification if there's a new high threat
       const high = data.find((a: Activity) => a.status === 'high');
       if (high && high.id !== lastHighId) {
-        setToastMsg(`Nueva amenaza alta detectada: ${high.message}`);
+        setToastMsg(`New high threat detected: ${high.message}`);
         lastHighId = high.id;
       }
     }
@@ -192,7 +192,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     } catch {
       startPolling();
     }
-    // Fallback inicial si no hay ws
+    // Fallback initial if no ws
     setTimeout(() => {
       if (!wsConnected && !pollingInterval) startPolling();
     }, 2000);
@@ -205,7 +205,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     // eslint-disable-next-line
   }, [activities, pageSize]);
 
-  // Efecto para actualizar lastUpdate (cada segundo)
+  // Effect to update lastUpdate (every second)
   useEffect(() => {
     const interval = setInterval(() => {
       setLastUpdate(new Date());
@@ -213,7 +213,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     return () => clearInterval(interval);
   }, []);
 
-  // Actualizar actividades filtradas cuando cambian las actividades originales
+  // Update filtered activities when original activities change
   useEffect(() => {
     if (!searchQuery && !filters.length) {
       setFilteredActivities(activities);
@@ -304,7 +304,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     setTimeRange(range);
   };
 
-  // Helper para obtener la hora local CDMX
+  // Helper to get CDMX local time
   const getCDMXHour = (date: Date) => {
     return date.toLocaleTimeString('es-MX', {
       hour: '2-digit',
@@ -404,23 +404,23 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     }
   };
 
-  // Filtro rápido por severidad
+  // Quick severity filter
   const filteredBySeverity = severityFilter
     ? (liveActivities || []).filter(a => a.status === severityFilter)
     : liveActivities;
-  // Paginación
+  // Pagination
   const totalPages = Math.ceil(filteredBySeverity.length / pageSize) || 1;
   const paginatedActivities = filteredBySeverity.slice((page - 1) * pageSize, page * pageSize);
-  // Use paginatedActivities para mostrar la tabla en tiempo real (fallback si está vacío y ya se intentó fetch)
+  // Use paginatedActivities to show real-time table (fallback if empty and fetch was already attempted)
   const displayActivities = (paginatedActivities && paginatedActivities.length > 0)
     ? paginatedActivities
     : (!fetchTried ? activities.slice(0, pageSize) : []);
 
-  // Exportar a CSV
+  // Export to CSV
   const exportToCSV = () => {
     const rows = [
       [
-        'ID', 'Mensaje', 'Dispositivo', 'IP Origen', 'IP Destino', 'Servicio', 'Acción', 'Protocolo', 'País Destino', 'Política', 'Bytes Tx', 'Bytes Rx', 'Severidad', 'Fecha/Hora'
+        'ID', 'Message', 'Device', 'Source IP', 'Destination IP', 'Service', 'Action', 'Protocol', 'Destination Country', 'Policy', 'Bytes Tx', 'Bytes Rx', 'Severity', 'Date/Time'
       ],
       ...filteredBySeverity.map(a => [
         a.id,
@@ -449,12 +449,12 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     URL.revokeObjectURL(url);
   };
 
-  // Función para convertir logs técnicos en mensajes amigables
+  // Function to convert technical logs into friendly messages
   const getReadableMessage = (activity: Activity) => {
     const message = activity.message.toLowerCase();
     let readableMsg = '';
 
-    // Extraer información relevante usando regex
+    // Extract relevant information using regex
     const srcIp = message.match(/srcip=([^\s]+)/)?.[1] || '';
     const dstIp = message.match(/dstip=([^\s]+)/)?.[1] || '';
     const action = message.match(/action="([^"]+)/)?.[1] || '';
@@ -462,25 +462,25 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
     const proto = message.match(/proto=([^\s]+)/)?.[1] || '';
     const type = message.match(/type="([^"]+)/)?.[1] || '';
 
-    // Construir mensaje amigable basado en el tipo de log
+    // Build friendly message based on log type
     if (type === 'traffic') {
-      readableMsg = `${action === 'accept' ? 'Se permitió' : 'Se bloqueó'} ${service ? `el servicio ${service}` : 'el tráfico'} 
-        desde ${srcIp} hacia ${dstIp}${proto ? ` usando ${proto.toUpperCase()}` : ''}`;
+      readableMsg = `${action === 'accept' ? 'Allowed' : 'Blocked'} ${service ? `${service} service` : 'traffic'} 
+        from ${srcIp} to ${dstIp}${proto ? ` using ${proto.toUpperCase()}` : ''}`;
     } else if (type === 'attack') {
-      readableMsg = `Se detectó un intento de ataque desde ${srcIp}`;
+      readableMsg = `Attack attempt detected from ${srcIp}`;
     } else if (type === 'virus') {
-      readableMsg = `Se detectó un virus en la comunicación entre ${srcIp} y ${dstIp}`;
+      readableMsg = `Virus detected in communication between ${srcIp} and ${dstIp}`;
     } else if (type === 'webfilter') {
-      readableMsg = `Se ${action === 'accept' ? 'permitió' : 'bloqueó'} el acceso web desde ${srcIp}`;
+      readableMsg = `Web access ${action === 'accept' ? 'allowed' : 'blocked'} from ${srcIp}`;
     } else {
-      // Si no es ninguno de los tipos anteriores, usar un mensaje genérico
-      readableMsg = `Actividad de red ${action} entre ${srcIp} y ${dstIp}`;
+      // If none of the above types, use a generic message
+      readableMsg = `Network activity ${action} between ${srcIp} and ${dstIp}`;
     }
 
     return readableMsg;
   };
 
-  // Helper para mostrar fecha/hora en CDMX con formato de 24 horas
+  // Helper to show date/time in CDMX with 24-hour format
   const formatCDMXDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleString('es-MX', { 
@@ -753,7 +753,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
       {/* Recent Activities */}
       <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Actividad Reciente</h3>
+          <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
       <div className="flex items-center space-x-4">
         {/* Filtro rápido por severidad */}
         <select
@@ -761,30 +761,30 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
           value={severityFilter}
           onChange={e => { setSeverityFilter(e.target.value); setPage(1); }}
         >
-          <option value="">Todas</option>
-          <option value="high">Alta</option>
-          <option value="medium">Media</option>
-          <option value="low">Baja</option>
+          <option value="">All</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
         </select>
         {/* Exportar a CSV */}
         <button
           className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs border border-blue-900"
           onClick={exportToCSV}
-        >Exportar CSV</button>
+        >Export CSV</button>
         {/* Estado de conexión */}
         <span className={wsConnected ? 'text-green-400 text-xs' : 'text-yellow-400 text-xs'}>
-          {wsConnected ? 'WebSocket activo' : 'Modo polling'}
+          {wsConnected ? 'WebSocket active' : 'Polling mode'}
         </span>
         <PulseIcon size={8} color="#10B981" animate={true} />
-        <span className="text-green-400 text-sm ml-2">Monitoreo en vivo</span>
+        <span className="text-green-400 text-sm ml-2">Live monitoring</span>
       </div>
         </div>
         {displayActivities.length === 0 ? (
           <div className="text-center py-8">
             <NetworkIcon size={48} color="#6B7280" className="mx-auto mb-4" />
-            <p className="text-gray-400">Sin actividad reciente</p>
+            <p className="text-gray-400">No recent activity</p>
             <p className="text-gray-500 text-sm mt-2">
-              Las actividades aparecerán aquí cuando se detecte tráfico en la red
+              Activities will appear here when network traffic is detected
             </p>
           </div>
         ) : (
@@ -792,16 +792,16 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
             <table className="min-w-full divide-y divide-gray-700">
               <thead>
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha / Hora</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Dispositivo Origen</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">IP Origen</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Servicio</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Acción</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Protocolo</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">País Destino</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Política</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date / Time</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Source Device</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Source IP</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Service</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Action</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Protocol</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destination Country</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Policy</th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Bytes Tx/Rx</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Severidad</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Severity</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
@@ -862,50 +862,50 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, activities, loading = fals
                 })}
               </tbody>
             </table>
-            {/* Paginación */}
+            {/* Pagination */}
             <div className="flex justify-end items-center mt-4 space-x-2">
               <button
                 className="px-2 py-1 rounded bg-gray-700 text-gray-200 text-xs disabled:opacity-50"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-              >Anterior</button>
-              <span className="text-gray-400 text-xs">Página {page} de {totalPages}</span>
+              >Previous</button>
+              <span className="text-gray-400 text-xs">Page {page} of {totalPages}</span>
               <button
                 className="px-2 py-1 rounded bg-gray-700 text-gray-200 text-xs disabled:opacity-50"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-              >Siguiente</button>
+              >Next</button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Modal de detalles de actividad */}
+      {/* Activity details modal */}
       {modalActivity && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
           <div className="bg-gray-900 rounded-lg p-8 max-w-lg w-full relative border border-gray-700">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-white" onClick={() => setModalActivity(null)}>&times;</button>
-            <h4 className="text-xl font-bold text-white mb-4">Detalle de Actividad</h4>
+            <h4 className="text-xl font-bold text-white mb-4">Activity Details</h4>
             <div className="space-y-2 text-gray-200 text-sm">
-              <div><b>Mensaje:</b> {modalActivity.message}</div>
-              <div><b>Dispositivo:</b> {modalActivity.device_name || 'Unknown'} {modalActivity.device_type ? `(${modalActivity.device_type})` : ''}</div>
-              <div><b>IP Origen:</b> {modalActivity.src_ip}</div>
-              <div><b>IP Destino:</b> {modalActivity.dst_ip}</div>
-              <div><b>Servicio:</b> {modalActivity.service}</div>
-              <div><b>Acción:</b> {modalActivity.action}</div>
-              <div><b>Protocolo:</b> {modalActivity.protocol}</div>
-              <div><b>País Destino:</b> {modalActivity.dst_country}</div>
-              <div><b>Política:</b> {modalActivity.policy_id}</div>
+              <div><b>Message:</b> {modalActivity.message}</div>
+              <div><b>Device:</b> {modalActivity.device_name || 'Unknown'} {modalActivity.device_type ? `(${modalActivity.device_type})` : ''}</div>
+              <div><b>Source IP:</b> {modalActivity.src_ip}</div>
+              <div><b>Destination IP:</b> {modalActivity.dst_ip}</div>
+              <div><b>Service:</b> {modalActivity.service}</div>
+              <div><b>Action:</b> {modalActivity.action}</div>
+              <div><b>Protocol:</b> {modalActivity.protocol}</div>
+              <div><b>Destination Country:</b> {modalActivity.dst_country}</div>
+              <div><b>Policy:</b> {modalActivity.policy_id}</div>
               <div><b>Bytes Tx/Rx:</b> {modalActivity.bytes_sent} / {modalActivity.bytes_received}</div>
-              <div><b>Severidad:</b> {modalActivity.status}</div>
-              <div><b>Fecha/Hora:</b> {formatCDMXDate(modalActivity.timestamp)}</div>
+              <div><b>Severity:</b> {modalActivity.status}</div>
+              <div><b>Date/Time:</b> {formatCDMXDate(modalActivity.timestamp)}</div>
             </div>
           </div>
         </div>,
         document.body
       )}
 
-      {/* Toast de alerta alta */}
+      {/* High alert toast */}
       {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
 
       {/* Network Geography - World Map */}
