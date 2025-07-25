@@ -1,18 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// src/components/WorldMap.tsx - Simple Geographic Threat Visualization
+import React from 'react';
+import { GlobeIcon, AlertIcon } from './Icons';
 
-// Interface compatible con tu sistema existente
-interface ThreatLocation {
-  id: string;
-  lat: number;
-  lng: number;
-  country: string;
-  city: string;
-  threatType: 'critical' | 'high' | 'medium' | 'low';
-  count: number;
-  ip: string;
-}
-
-// Interface para compatibilidad con tu Activity data
 interface Activity {
   id: number;
   message: string;
@@ -22,335 +11,284 @@ interface Activity {
   timestamp: string;
   source: string;
   ip_address?: string;
-  country?: string;
+  dst_country?: string;
 }
 
 interface WorldMapProps {
-  threats?: ThreatLocation[];
-  activities?: Activity[]; // Compatibilidad con tu data existente
-  className?: string;
+  activities: Activity[];
 }
 
-const WorldMap: React.FC<WorldMapProps> = ({ 
-  threats = [], 
-  activities = [],
-  className = "" 
-}) => {
-  const [animatedThreats, setAnimatedThreats] = useState<ThreatLocation[]>([]);
-  const [mapLoaded, setMapLoaded] = useState(false);
+// Utilidad para obtener el código ISO2 a partir del nombre de país (simple, para demo)
+const countryNameToISO2: Record<string, string> = {
+  'United States': 'US',
+  'Mexico': 'MX',
+  'Canada': 'CA',
+  'Brazil': 'BR',
+  'Argentina': 'AR',
+  'United Kingdom': 'GB',
+  'France': 'FR',
+  'Germany': 'DE',
+  'Russia': 'RU',
+  'China': 'CN',
+  'Japan': 'JP',
+  'India': 'IN',
+  'Australia': 'AU',
+  'Spain': 'ES',
+  'Italy': 'IT',
+  'Unknown': 'UN',
+};
 
-  // Convertir tus activities a formato ThreatLocation
-  const convertActivitiesToThreats = (activities: Activity[]): ThreatLocation[] => {
-    return activities
-      .filter(activity => activity.country && activity.ip_address)
-      .map((activity, index) => ({
-        id: activity.id.toString(),
-        lat: getCountryCoordinates(activity.country!).lat,
-        lng: getCountryCoordinates(activity.country!).lng,
-        country: activity.country!,
-        city: activity.country!, // Simplificado para demo
-        threatType: activity.status === 'high' ? 'critical' : 
-                   activity.status === 'medium' ? 'high' : 'medium' as 'critical' | 'high' | 'medium' | 'low',
-        count: Math.floor(activity.threat_score * 100),
-        ip: activity.ip_address || '0.0.0.0'
-      }));
-  };
+// SVG flags (solo algunos países comunes, puedes expandir)
+const FlagSVG: React.FC<{ code: string; size?: number }> = ({ code, size = 18 }) => {
+  switch (code) {
+    case 'US': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#b22234"/><g fill="#fff"><rect y="2" width="32" height="4"/><rect y="10" width="32" height="4"/><rect y="18" width="32" height="4"/><rect y="26" width="32" height="4"/></g><rect width="14" height="14" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="2" r="1"/><circle cx="6" cy="2" r="1"/><circle cx="10" cy="2" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="10" cy="6" r="1"/><circle cx="2" cy="10" r="1"/><circle cx="6" cy="10" r="1"/><circle cx="10" cy="10" r="1"/></g></svg>;
+    case 'MX': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><rect width="10.67" height="32" fill="#006847"/><rect x="21.33" width="10.67" height="32" fill="#ce1126"/></svg>;
+    case 'CA': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><rect width="7" height="32" fill="#d52b1e"/><rect x="25" width="7" height="32" fill="#d52b1e"/><polygon points="16,8 18,16 16,14 14,16" fill="#d52b1e"/></svg>;
+    case 'BR': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#009b3a"/><polygon points="16,6 28,16 16,26 4,16" fill="#ffdf00"/><circle cx="16" cy="16" r="6" fill="#3e4095"/></svg>;
+    case 'GB': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#00247d"/><rect x="14" width="4" height="32" fill="#fff"/><rect y="14" width="32" height="4" fill="#fff"/><rect x="15" width="2" height="32" fill="#cf142b"/><rect y="15" width="32" height="2" fill="#cf142b"/></svg>;
+    case 'FR': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><rect width="10.67" height="32" fill="#0055a4"/><rect x="21.33" width="10.67" height="32" fill="#ef4135"/></svg>;
+    case 'DE': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="10.67" fill="#000"/><rect y="10.67" width="32" height="10.67" fill="#dd0000"/><rect y="21.33" width="32" height="10.67" fill="#ffce00"/></svg>;
+    case 'RU': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="10.67" fill="#fff"/><rect y="10.67" width="32" height="10.67" fill="#0039a6"/><rect y="21.33" width="32" height="10.67" fill="#d52b1e"/></svg>;
+    case 'CN': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#de2910"/><polygon points="6,6 8,12 2,9 10,9 4,12" fill="#ffde00"/></svg>;
+    case 'JP': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><circle cx="16" cy="16" r="8" fill="#bc002d"/></svg>;
+    case 'IN': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><rect y="0" width="32" height="10.67" fill="#ff9933"/><rect y="21.33" width="32" height="10.67" fill="#138808"/><circle cx="16" cy="16" r="4" fill="#000088"/></svg>;
+    case 'AU': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#00247d"/><rect x="14" width="4" height="32" fill="#fff"/><rect y="14" width="32" height="4" fill="#fff"/></svg>;
+    case 'ES': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#aa151b"/><rect y="8" width="32" height="16" fill="#f1bf00"/></svg>;
+    case 'IT': return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#fff"/><rect width="10.67" height="32" fill="#008c45"/><rect x="21.33" width="10.67" height="32" fill="#cd212a"/></svg>;
+    default: return <svg width={size} height={size} viewBox="0 0 32 32"><rect width="32" height="32" fill="#888"/></svg>;
+  }
+};
 
-  // Coordenadas simplificadas de países
-  const getCountryCoordinates = (country: string) => {
-    const coords: { [key: string]: { lat: number; lng: number } } = {
-      'China': { lat: 39.9042, lng: 116.4074 },
-      'Russia': { lat: 55.7558, lng: 37.6176 },
-      'USA': { lat: 40.7128, lng: -74.0060 },
-      'Germany': { lat: 52.5200, lng: 13.4050 },
-      'Brazil': { lat: -23.5505, lng: -46.6333 },
-      'Japan': { lat: 35.6762, lng: 139.6503 },
-      'India': { lat: 28.6139, lng: 77.2090 },
-      'UK': { lat: 51.5074, lng: -0.1278 }
-    };
-    return coords[country] || { lat: 0, lng: 0 };
-  };
-
-  // Datos de demo para mostrar actividad global
-  const demoThreats: ThreatLocation[] = [
-    { id: '1', lat: 39.9042, lng: 116.4074, country: 'China', city: 'Beijing', threatType: 'critical', count: 156, ip: '202.96.134.133' },
-    { id: '2', lat: 55.7558, lng: 37.6176, country: 'Russia', city: 'Moscow', threatType: 'high', count: 89, ip: '77.88.55.77' },
-    { id: '3', lat: 40.7128, lng: -74.0060, country: 'USA', city: 'New York', threatType: 'medium', count: 67, ip: '8.8.8.8' },
-    { id: '4', lat: 51.5074, lng: -0.1278, country: 'UK', city: 'London', threatType: 'low', count: 34, ip: '212.58.244.23' },
-    { id: '5', lat: 35.6762, lng: 139.6503, country: 'Japan', city: 'Tokyo', threatType: 'high', count: 78, ip: '202.232.2.133' },
-    { id: '6', lat: -23.5505, lng: -46.6333, country: 'Brazil', city: 'São Paulo', threatType: 'medium', count: 45, ip: '200.160.2.3' },
-    { id: '7', lat: 28.6139, lng: 77.2090, country: 'India', city: 'New Delhi', threatType: 'critical', count: 134, ip: '117.239.107.108' },
-    { id: '8', lat: 52.5200, lng: 13.4050, country: 'Germany', city: 'Berlin', threatType: 'low', count: 23, ip: '217.160.0.112' },
-  ];
-
-  // Combinar threats prop con activities convertidas y demo threats
-  const realThreats = threats.length > 0 ? threats : convertActivitiesToThreats(activities);
-  const allThreats = realThreats.length > 0 ? realThreats : demoThreats;
-
-  useEffect(() => {
-    // Simular carga del mapa
-    const timer = setTimeout(() => {
-      setMapLoaded(true);
-      setAnimatedThreats(allThreats);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Función para convertir coordenadas geográficas a posición SVG
-  const coordToSVG = (lat: number, lng: number) => {
-    const x = ((lng + 180) / 360) * 800;
-    const y = ((90 - lat) / 180) * 400;
-    return { x, y };
-  };
-
-  // Función para obtener color según el tipo de amenaza
-  const getThreatColor = (type: string): string => {
-    switch (type) {
-      case 'critical': return '#dc2626'; // Rojo intenso
-      case 'high': return '#ea580c';     // Naranja
-      case 'medium': return '#d97706';   // Amarillo
-      case 'low': return '#16a34a';      // Verde
-      default: return '#6b7280';         // Gris
+const WorldMap: React.FC<WorldMapProps> = ({ activities }) => {
+  // Estado para filtro interactivo de país
+  const [selectedCountry, setSelectedCountry] = React.useState<string | null>(null);
+  // Group activities by destination country (real backend field)
+  type CountryStats = { count: number; highThreat: number };
+  const countryStats: Record<string, CountryStats> = activities.reduce((acc, activity) => {
+    const country = activity.dst_country || 'Unknown';
+    if (!acc[country]) {
+      acc[country] = { count: 0, highThreat: 0 };
     }
+    acc[country].count++;
+    if (activity.status === 'high') {
+      acc[country].highThreat++;
+    }
+    return acc;
+  }, {} as Record<string, CountryStats>);
+
+  const topCountries: [string, CountryStats][] = Object.entries(countryStats)
+    .sort(([,a], [,b]) => (b as CountryStats).count - (a as CountryStats).count)
+    .slice(0, 10);
+
+  const getThreatColor = (count: number, highThreat: number) => {
+    if (highThreat > 0) return 'text-red-400';
+    if (count > 5) return 'text-yellow-400';
+    if (count > 0) return 'text-green-400';
+    return 'text-gray-400';
   };
 
-  // Función para obtener tamaño del punto según el count
-  const getThreatSize = (count: number): number => {
-    if (count > 100) return 8;
-    if (count > 50) return 6;
-    if (count > 20) return 4;
-    return 3;
+  const getThreatLevel = (count: number, highThreat: number) => {
+    if (highThreat > 0) return 'HIGH';
+    if (count > 5) return 'MEDIUM';
+    if (count > 0) return 'LOW';
+    return 'NONE';
   };
+
+  // Filtrar eventos recientes según país seleccionado
+  const filteredActivities = selectedCountry && selectedCountry !== 'All'
+    ? activities.filter(a => (a.dst_country || 'Unknown') === selectedCountry)
+    : activities;
 
   return (
-    <div className={`relative bg-gray-800 rounded-lg border border-gray-700 overflow-hidden ${className}`} style={{ zIndex: 1 }}>
-      {/* Header */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">
-            🌍 Mapa Global de Amenazas
-          </h3>
-          <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-gray-300">En tiempo real</span>
-            </div>
-            <span className="text-gray-400">
-              {animatedThreats.length} ubicaciones activas
-            </span>
-          </div>
+    <div className="space-y-4">
+      {activities.length === 0 ? (
+        <div className="text-center py-8">
+          <GlobeIcon size={48} color="#6B7280" className="mx-auto mb-4" />
+          <p className="text-gray-400">No geographic data available</p>
+          <p className="text-gray-500 text-sm mt-2">
+            Threat locations will appear here when activity is detected
+          </p>
         </div>
-      </div>
-
-      {/* Loading State */}
-      {!mapLoaded && (
-        <div className="flex items-center justify-center h-96 bg-dark-bg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyber-blue mx-auto mb-4"></div>
-            <p className="text-gray-400">Cargando datos globales...</p>
-          </div>
-        </div>
-      )}
-
-      {/* World Map SVG */}
-      {mapLoaded && (
-        <div className="relative h-96 bg-gray-900 overflow-hidden" style={{ zIndex: 1 }}>
-          <svg
-            viewBox="0 0 800 400"
-            className="w-full h-full"
-            style={{ background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)' }}
-          >
-            {/* Simplified world map outline */}
-            <g fill="none" stroke="#374151" strokeWidth="1" opacity="0.3">
-              {/* Continents - Simplified outlines */}
-              {/* North America */}
-              <path d="M 100 120 Q 150 100 200 120 L 250 140 L 280 180 L 200 200 L 150 180 L 100 160 Z" />
-              
-              {/* South America */}
-              <path d="M 180 220 Q 200 240 220 280 L 240 320 L 200 340 L 180 320 L 160 280 L 170 240 Z" />
-              
-              {/* Europe */}
-              <path d="M 350 100 Q 380 90 420 100 L 450 120 L 430 140 L 400 130 L 370 120 Z" />
-              
-              {/* Africa */}
-              <path d="M 380 150 Q 420 160 440 200 L 450 260 L 420 290 L 390 280 L 370 240 L 375 180 Z" />
-              
-              {/* Asia */}
-              <path d="M 480 80 Q 550 70 620 90 L 680 110 L 720 140 L 700 180 L 650 160 L 580 150 L 520 130 L 480 110 Z" />
-              
-              {/* Australia */}
-              <path d="M 600 280 Q 650 270 680 280 L 700 300 L 680 310 L 640 305 L 610 295 Z" />
-            </g>
-
-            {/* Grid lines for professional look */}
-            <defs>
-              <pattern id="grid" width="40" height="20" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 20" fill="none" stroke="#1f2937" strokeWidth="0.5" opacity="0.2"/>
-              </pattern>
-            </defs>
-            <rect width="800" height="400" fill="url(#grid)" />
-
-            {/* Threat points */}
-            {animatedThreats.map((threat, index) => {
-              const pos = coordToSVG(threat.lat, threat.lng);
-              const size = getThreatSize(threat.count);
-              const color = getThreatColor(threat.threatType);
-              
-              return (
-                <g key={threat.id}>
-                  {/* Pulsing circle effect */}
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r={size * 2}
-                    fill={color}
-                    opacity="0.2"
-                    className="animate-ping"
-                    style={{
-                      animationDelay: `${index * 0.3}s`,
-                      animationDuration: '2s'
-                    }}
-                  />
-                  
-                  {/* Main threat point */}
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r={size}
-                    fill={color}
-                    stroke="#ffffff"
-                    strokeWidth="1"
-                    className="cursor-pointer hover:scale-125 transition-transform duration-200"
-                    style={{
-                      filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.3))',
-                      animation: `fadeIn 0.8s ease-out ${index * 0.2}s both`
-                    }}
-                  />
-                  
-                  {/* Threat count label */}
-                  {threat.count > 50 && (
-                    <text
-                      x={pos.x}
-                      y={pos.y - size - 8}
-                      textAnchor="middle"
-                      className="text-xs fill-white font-semibold"
-                      style={{
-                        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))',
-                        animation: `fadeIn 1s ease-out ${index * 0.2 + 0.5}s both`
-                      }}
-                    >
-                      {threat.count}
-                    </text>
-                  )}
+      ) : (
+        <>
+          {/* World Map Placeholder */}
+          <div className="bg-gray-700 rounded-lg p-8 text-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <svg viewBox="0 0 1000 500" className="w-full h-full">
+                {/* Simplified world map outline */}
+                <g fill="currentColor" className="text-gray-400">
+                  {/* North America */}
+                  <path d="M150 150 L250 140 L280 180 L250 220 L150 200 Z" />
+                  {/* Europe */}
+                  <path d="M450 120 L520 115 L540 140 L520 160 L450 155 Z" />
+                  {/* Asia */}
+                  <path d="M550 120 L750 110 L780 180 L550 190 Z" />
+                  {/* Africa */}
+                  <path d="M450 200 L550 195 L540 300 L460 305 Z" />
+                  {/* South America */}
+                  <path d="M250 250 L320 245 L310 350 L240 345 Z" />
+                  {/* Australia */}
+                  <path d="M650 320 L750 315 L740 360 L650 365 Z" />
                 </g>
-              );
-            })}
+              </svg>
+            </div>
+            
+            {/* Threat indicators on map */}
+            <div className="relative z-10">
+              <GlobeIcon size={64} color="#3B82F6" className="mx-auto mb-4" />
+              <h4 className="text-white text-lg font-semibold">Global Threat Map</h4>
+              <p className="text-gray-400 text-sm">
+                {activities.length} activities from {Object.keys(countryStats).length} locations
+              </p>
+            </div>
 
-            {/* Connection lines between major threats */}
-            {animatedThreats
-              .filter(t => t.threatType === 'critical' || t.threatType === 'high')
-              .slice(0, 4)
-              .map((threat, index, arr) => {
-                if (index === arr.length - 1) return null;
-                const start = coordToSVG(threat.lat, threat.lng);
-                const end = coordToSVG(arr[index + 1].lat, arr[index + 1].lng);
-                
+            {/* Simulated threat points */}
+            {topCountries.slice(0, 5).map(([country, stats], index) => (
+              <div
+                key={country}
+                className="absolute animate-ping"
+                style={{
+                  left: `${20 + index * 15}%`,
+                  top: `${30 + index * 8}%`,
+                }}
+              >
+                <div className={`w-3 h-3 rounded-full ${
+                  stats.highThreat > 0 ? 'bg-red-500' : 
+                  stats.count > 5 ? 'bg-yellow-500' : 'bg-green-500'
+                }`}></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Country Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Top Threat Countries */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <h5 className="text-white font-semibold mb-3 flex items-center">
+                <AlertIcon size={16} className="mr-2" />
+                Top Threat Sources
+              </h5>
+              <div className="space-y-2">
+                {topCountries.slice(0, 5).map(([country, stats]) => {
+                  // Buscar código ISO2
+                  const iso2 = countryNameToISO2[country] || 'UN';
+                  const isSelected = selectedCountry === country;
+                  return (
+                    <div
+                      key={country}
+                      className={`flex items-center justify-between p-2 bg-gray-800 rounded cursor-pointer transition border ${isSelected ? 'border-blue-400 shadow-lg' : 'border-transparent hover:border-blue-700'}`}
+                      onClick={() => setSelectedCountry(isSelected ? null : country)}
+                      title={isSelected ? 'Quitar filtro' : `Ver solo eventos de ${country}`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          stats.highThreat > 0 ? 'bg-red-500' : 
+                          stats.count > 5 ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}></div>
+                        <FlagSVG code={iso2} size={18} />
+                        <span className={`text-sm ${isSelected ? 'text-blue-300 font-bold' : 'text-white'}`}>{country}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-xs font-medium ${getThreatColor(stats.count, stats.highThreat)}`}>
+                          {getThreatLevel(stats.count, stats.highThreat)}
+                        </div>
+                        <div className="text-gray-400 text-xs">{stats.count} events</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Geographic Summary */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <h5 className="text-white font-semibold mb-3 flex items-center">
+                <GlobeIcon size={16} className="mr-2" />
+                Geographic Summary
+              </h5>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Total Locations:</span>
+                  <span className="text-white">{Object.keys(countryStats).length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">High Risk Countries:</span>
+                  <span className="text-red-400">
+                    {Object.values(countryStats).filter(s => s.highThreat > 0).length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Medium Risk Countries:</span>
+                  <span className="text-yellow-400">
+                    {Object.values(countryStats).filter(s => s.count > 5 && s.highThreat === 0).length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Low Risk Countries:</span>
+                  <span className="text-green-400">
+                    {Object.values(countryStats).filter(s => s.count > 0 && s.count <= 5 && s.highThreat === 0).length}
+                  </span>
+                </div>
+              </div>
+
+              {/* Threat Level Distribution */}
+              <div className="mt-4">
+                <p className="text-gray-400 text-xs mb-2">Global Threat Level</p>
+                <div className="flex space-x-1">
+                  <div className="flex-1 h-2 bg-green-500 rounded-l"></div>
+                  <div className="flex-1 h-2 bg-yellow-500"></div>
+                  <div className="flex-1 h-2 bg-red-500 rounded-r"></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>Low</span>
+                  <span>Medium</span>
+                  <span>High</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Geographic Events */}
+          <div className="bg-gray-700 rounded-lg p-4">
+            <h5 className="text-white font-semibold mb-3 flex items-center">
+              Recent Geographic Events
+              {selectedCountry && (
+                <button
+                  className="ml-3 px-2 py-1 text-xs rounded bg-blue-800 text-white border border-blue-400 hover:bg-blue-700 transition"
+                  onClick={() => setSelectedCountry(null)}
+                  title="Quitar filtro de país"
+                >Quitar filtro</button>
+              )}
+            </h5>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {filteredActivities.slice(0, 8).map((activity) => {
+                const iso2 = countryNameToISO2[activity.dst_country || 'Unknown'] || 'UN';
                 return (
-                  <line
-                    key={`connection-${index}`}
-                    x1={start.x}
-                    y1={start.y}
-                    x2={end.x}
-                    y2={end.y}
-                    stroke="#ef4444"
-                    strokeWidth="1"
-                    opacity="0.3"
-                    strokeDasharray="2,2"
-                    className="animate-pulse"
-                  />
+                  <div key={activity.id} className="flex items-center justify-between p-2 bg-gray-800 rounded text-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        activity.status === 'high' ? 'bg-red-500' : 
+                        activity.status === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}></div>
+                      <FlagSVG code={iso2} size={16} />
+                      <span className="text-white">{activity.dst_country || 'Unknown'}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-gray-400">{activity.ip_address || 'N/A'}</div>
+                      <div className="text-xs text-gray-500">
+                        {new Date(activity.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
-          </svg>
-
-          {/* Floating threat info cards */}
-          <div className="absolute top-4 right-4 space-y-2" style={{ zIndex: 2, maxWidth: '200px' }}>
-            {animatedThreats
-              .filter(t => t.threatType === 'critical')
-              .slice(0, 2)
-              .map((threat, index) => (
-                <div
-                  key={`info-${threat.id}`}
-                  className="bg-red-900 bg-opacity-90 backdrop-blur-sm rounded-lg p-2 border border-red-500 shadow-lg text-xs"
-                  style={{
-                    animation: `slideIn 0.8s ease-out ${index * 0.3}s both`,
-                    zIndex: 3
-                  }}
-                >
-                  <div className="flex items-center space-x-1">
-                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-red-200 font-semibold text-xs">CRÍTICO</span>
-                  </div>
-                  <p className="text-white text-xs font-medium">{threat.city}, {threat.country}</p>
-                  <p className="text-red-200 text-xs">{threat.count} amenazas</p>
-                  <p className="text-gray-300 text-xs font-mono">{threat.ip}</p>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Legend */}
-      <div className="p-4 border-t border-gray-700 bg-dark-bg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <span className="text-sm text-gray-400 font-medium">Nivel de Amenaza:</span>
-            <div className="flex items-center space-x-4">
-              {[
-                { type: 'critical', label: 'Crítico', color: '#dc2626' },
-                { type: 'high', label: 'Alto', color: '#ea580c' },
-                { type: 'medium', label: 'Medio', color: '#d97706' },
-                { type: 'low', label: 'Bajo', color: '#16a34a' }
-              ].map(({ type, label, color }) => (
-                <div key={type} className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: color }}
-                  ></div>
-                  <span className="text-xs text-gray-300">{label}</span>
-                </div>
-              ))}
+              {filteredActivities.length === 0 && (
+                <div className="text-gray-400 text-center py-4">No events for this country.</div>
+              )}
             </div>
           </div>
-          <div className="text-xs text-gray-500">
-            Actualizado: {new Date().toLocaleTimeString()}
-          </div>
-        </div>
-      </div>
-
-      {/* CSS Animations usando style normal */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes slideIn {
-          from { 
-            opacity: 0; 
-            transform: translateX(100%);
-          }
-          to { 
-            opacity: 1; 
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
-      `}</style>
+        </>
+      )}
     </div>
   );
 };
