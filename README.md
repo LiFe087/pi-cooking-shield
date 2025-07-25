@@ -478,135 +478,199 @@ System Hardening:
 
 ---
 
-## 🤝 **TEAM & DEVELOPMENT**
+## 📢 **NOTAS DE VERSIÓN Y HISTÓRICO DE CAMBIOS**
 
-### **👥 2-Man Army Team**
-```yaml
-Luis Eduardo Reséndiz Martínez:
-Role: Hardware Integration & Deployment Specialist
-Responsibilities:
-  - Hardware setup and configuration
-  - Network topology implementation  
-  - System integration testing
-  - Production deployment
-  - Demo execution
-
-Claude (AI Assistant):
-Role: Software Architecture & Development
-Responsibilities:
-  - Code design and implementation
-  - Architecture planning
-  - Documentation creation
-  - Problem solving and debugging
-  - Technical optimization
-```
-
-### **🛠️ Development Workflow**
-```yaml
-Development Environment: Windows 11
-Frontend Development: React dev server (localhost:3000)
-Backend Development: Flask dev server (localhost:5000)
-Version Control: Git with professional commit messages
-Testing: Manual testing + API validation
-Deployment: SSH to edge devices + systemd services
-
-Daily Workflow:
-1. Morning sync and planning
-2. Feature development and testing
-3. Integration testing on hardware
-4. Documentation updates
-5. Evening review and next-day planning
-```
+- **v2.5 (actual):**
+  - Documentación técnica y de usuario ampliada.
+  - Sistema de alertas y monitoreo avanzado en frontend.
+  - Integración de datasets reales y soporte Docker.
+  - Mejoras de rendimiento y estabilidad.
+- **v2.4 y anteriores:**  
+  - Primer prototipo funcional, integración básica ML, dashboard inicial.
 
 ---
 
-## 📋 **PROJECT STATUS**
+## 🧪 **TESTING Y VALIDACIÓN**
 
-### **✅ Completed Milestones**
-- [x] **Week 1**: Foundation architecture and basic integration
-- [x] **Frontend**: Professional React dashboard with animations
-- [x] **Backend**: Flask API with real-time capabilities
-- [x] **ML Engine**: Threat detection with scikit-learn
-- [x] **Integration**: End-to-end data flow working
-- [x] **UI/UX**: Enterprise-grade interface design
-- [x] **Documentation**: Complete technical documentation
-
-### **🔄 Current Development**
-- [ ] **Advanced Features**: Geographic mapping, network topology
-- [ ] **Performance**: Optimization and scaling
-- [ ] **Testing**: Comprehensive test scenarios
-- [ ] **Polish**: Final UI improvements and bug fixes
-
-### **⏳ Upcoming**
-- [ ] **Demo Preparation**: Multiple presentation scenarios
-- [ ] **Documentation**: User manual and deployment guide
-- [ ] **Optimization**: Performance tuning and hardening
-- [ ] **Presentation**: Final academic presentation
+- **Pruebas unitarias:**  
+  Scripts disponibles en `/tests` para validar componentes críticos del backend y frontend.
+- **Pruebas de integración:**  
+  Simulación de logs y ataques para verificar el flujo end-to-end.
+- **Cobertura:**  
+  Se recomienda mantener >80% de cobertura en módulos core.
+- **Validación manual:**  
+  Checklist de funcionalidades clave antes de cada entrega.
 
 ---
 
-## 🏆 **SUCCESS METRICS**
+## 🌍 **INTERNACIONALIZACIÓN Y LOCALIZACIÓN**
 
-### **📊 Technical Achievements**
-```yaml
-✅ Sub-second response times achieved
-✅ Professional-grade UI implemented
-✅ Real-time threat detection working
-✅ Scalable architecture deployed
-✅ Enterprise features implemented
-✅ Complete system integration
-✅ Educational objectives met
-```
-
-### **🎓 Academic Achievements**
-```yaml
-✅ Distributed systems knowledge demonstrated
-✅ Modern web development skills applied
-✅ Machine learning concepts implemented
-✅ Network security principles mastered
-✅ Professional development practices used
-✅ Team collaboration skills developed
-```
+- **Soporte multilenguaje:**  
+  Estructura preparada para traducción de la interfaz (i18n).
+- **Traducciones:**  
+  Español e inglés incluidos; fácil de extender a otros idiomas.
 
 ---
 
-## 📞 **CONTACT & SUPPORT**
+## 🧑‍💻 **PERFILES DE USUARIO Y ROLES**
 
-### **🎓 Academic Context**
-```
-Universidad Politécnica de Querétaro
-Ingeniería en Redes y Telecomunicaciones
-Proyecto Integrador - Grupo IRT191
-Profesora: Dra. Ely Karina Anaya Rivera
-```
-
-### **👨‍💻 Development Team**
-```
-Luis Eduardo Reséndiz Martínez
-Student ID: 122042265
-Email: [academic email]
-
-Technical Assistant: Claude (Anthropic AI)
-Role: Software development and architecture
-```
+- **Administrador:**  
+  Acceso total, configuración de alertas, gestión de usuarios y visualización de logs completos.
+- **Operador:**  
+  Visualización de dashboard, alertas y métricas, sin acceso a configuración avanzada.
+- **Invitado:**  
+  Acceso limitado a métricas generales y visualizaciones públicas.
 
 ---
 
-## 📄 **LICENSE**
+## 🏷️ **LICENCIA Y USO**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Licencia MIT:**  
+  Uso libre para fines académicos, comerciales y personales.
+- **Créditos obligatorios:**  
+  Se agradece mantener los créditos originales en forks y derivados.
+
+---
+
+## 🧩 **RECURSOS ADICIONALES**
+
+- **Presentaciones y posters:**  
+  Material gráfico disponible en `/docs/presentations` para difusión académica y empresarial.
+- **Videos demo:**  
+  Enlace a videos de demostración y walkthroughs en el repositorio o canal oficial.
+- **Plantillas de reportes:**  
+  Archivos base para informes técnicos y ejecutivos.
 
 ---
 
-## 🙏 **ACKNOWLEDGMENTS**
+## 🛡️ **CÓDIGO DE CONDUCTA**
 
-- **Universidad Politécnica de Querétaro** for providing the educational framework
-- **Open Source Community** for the tools and libraries used
-- **Enterprise SIEM vendors** for inspiration and feature benchmarking
-- **Edge computing pioneers** for making this architecture possible
+- **Respeto y colaboración:**  
+  Se espera un ambiente inclusivo y profesional en todas las interacciones.
+- **Reporte de incidentes:**  
+  Cualquier conducta inapropiada puede ser reportada vía Issues o contacto directo.
 
 ---
+
+## 📬 **CONTACTO RÁPIDO**
+
+- **Soporte técnico:**  
+  [academic email]  
+- **Consultas empresariales:**  
+  LinkedIn: [perfil de Luis Eduardo Reséndiz Martínez]
+- **Comunidad:**  
+  GitHub Discussions y canal de Telegram (si aplica).
+
+---
+
+*¡Gracias por usar PI-Cooking-Shield! Tu feedback y contribuciones ayudan a mejorar la ciberseguridad para todos.*
 
 *🍳 Cooking up cybersecurity, one threat at a time! 🛡️*
 
 **PI-Cooking-Shield v2.5** - Professional distributed cybersecurity for the modern age.
+
+---
+
+## 🧬 **FULL TECHNICAL REFERENCE (FOR EXPERTS)**
+
+### **System Overview**
+
+- **Architecture:** Distributed microservices, edge-first, stateless API design.
+- **Data Flow:** Syslog UDP → Log Parser → Feature Extraction → ML Inference (REST) → Results Aggregation → WebSocket/REST to Frontend.
+- **Deployment:** Multi-node (RPi/Jetson), Docker-ready, systemd integration, persistent volumes for models/data.
+
+---
+
+### **Backend (Flask API & ML Engine)**
+
+#### **API Design**
+- **RESTful endpoints** with JSON payloads, stateless, CORS-enabled.
+- **Async job management** for ML training (job queue, progress polling).
+- **Error handling:** Standardized error codes, logging, and tracebacks.
+- **Security:** Input validation, rate limiting (optional), audit logging.
+
+#### **Log Parsing & Feature Engineering**
+- **Custom parsers** for FortiGate, IoT-23, NSL-KDD, CICIDS2017.
+- **Feature pipeline:** 
+  - Tokenization, normalization, categorical encoding (OneHot/Label).
+  - Extraction of statistical, temporal, and protocol-based features.
+  - Support for dynamic feature sets per dataset.
+- **Batch and streaming support:** Real-time ingestion and batch processing.
+
+#### **ML Model Management**
+- **Model registry:** Versioned models stored with joblib, metadata tracked (accuracy, F1, dataset, hyperparams).
+- **Supported algorithms:** Isolation Forest, RandomForest, MLP, Gradient Boosting, VotingClassifier ensembles.
+- **Training:** Cross-validation, grid/random search for hyperparameter tuning, early stopping for neural nets.
+- **Inference:** REST endpoint `/analyze`, supports single/batch prediction, returns threat score, class, and confidence.
+
+#### **Performance & Monitoring**
+- **Metrics exposed:** API latency, inference time, resource usage (CPU/RAM), job queue status.
+- **Logging:** Structured logs (JSON), error and access logs, optional integration with ELK stack.
+- **Health checks:** `/health` endpoint, Docker healthcheck compatible.
+
+---
+
+### **Frontend (React SPA)**
+
+#### **State Management**
+- **Hooks + Context API:** For global state (user, config, alerts).
+- **WebSocket integration:** For real-time updates (threats, metrics).
+- **Optimized rendering:** Memoization, lazy loading, code splitting.
+
+#### **Visualization**
+- **Recharts:** Custom themes, responsive, animated transitions.
+- **SVG-based topology:** Dynamic network maps, device status, alert overlays.
+- **Accessibility:** ARIA roles, keyboard navigation, colorblind-friendly palettes.
+
+#### **Security**
+- **Input sanitization:** All user input validated client-side.
+- **Session management:** JWT-ready, CSRF protection (if auth enabled).
+- **Error boundaries:** Robust error handling for UI crashes.
+
+---
+
+### **DevOps & Deployment**
+
+- **Docker Compose:** Multi-service orchestration (backend, ml-service, frontend, db).
+- **CI/CD:** Linting, unit/integration tests, build pipelines (GitHub Actions).
+- **Systemd services:** Auto-restart, logging, resource limits.
+- **Backup/restore scripts:** For models, logs, and datasets.
+
+---
+
+### **Extensibility**
+
+- **Plugin-ready:** Add new log parsers, ML models, or dashboard widgets via modular interfaces.
+- **API versioning:** Backward-compatible endpoint evolution.
+- **Internationalization:** i18n-ready, translation files per language.
+
+---
+
+### **Security Hardening**
+
+- **Network isolation:** VLANs, firewall rules, SSH key-only access.
+- **TLS/HTTPS:** Recommended for all endpoints in production.
+- **Least privilege:** Services run as non-root, minimal OS packages.
+- **Audit trail:** All admin actions and model changes logged.
+
+---
+
+### **Testing & Validation**
+
+- **Unit tests:** pytest/unittest for backend, Jest/React Testing Library for frontend.
+- **Integration tests:** End-to-end flows with synthetic and real logs.
+- **Load testing:** Locust/JMeter scripts for API and ML endpoints.
+- **Static analysis:** Bandit (Python), ESLint (JS/TS), Dependabot for dependencies.
+
+---
+
+### **Advanced Usage**
+
+- **Custom dataset ingestion:** Upload CSV/JSON logs, map fields via UI or config.
+- **Model retraining:** Trigger via API or UI, monitor progress, rollback to previous model if needed.
+- **Alerting:** Webhooks, email, Slack integration for critical events.
+- **SIEM integration:** Export events in CEF/LEEF/JSON for external platforms.
+
+---
+
+*For full API docs, see `/docs/api_reference.md` or use the OpenAPI/Swagger spec at `/api/docs` if enabled.*
