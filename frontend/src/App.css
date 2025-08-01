@@ -1,0 +1,195 @@
+/* Agregar esto al final de tu index.css para arreglar los bugs de layout */
+
+/* Prevent z-index issues and overlapping */
+.main-container {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-container {
+  position: relative;
+  z-index: 10;
+}
+
+.topbar-container {
+  position: relative;
+  z-index: 5;
+}
+
+.content-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure SVG elements stay within bounds */
+svg {
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Fix for floating elements in WorldMap */
+.world-map-container {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.world-map-floating-cards {
+  position: absolute;
+  z-index: 2;
+  max-width: 200px;
+  pointer-events: auto;
+}
+
+/* Ensure charts stay within their containers */
+.recharts-wrapper {
+  overflow: hidden !important;
+}
+
+/* Fix for auto-refresh controls */
+.auto-refresh-controls {
+  position: absolute;
+  z-index: 20;
+  background: rgba(55, 65, 81, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+/* Prevent content from overlapping sidebar */
+.main-content {
+  margin-left: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix scrolling issues */
+.scroll-container {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Ensure responsive behavior */
+@media (max-width: 1024px) {
+  .world-map-floating-cards {
+    position: static;
+    max-width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .world-map-container {
+    overflow: visible;
+  }
+}
+
+/* Fix for chart tooltips appearing behind other elements */
+.recharts-tooltip-wrapper {
+  z-index: 1000 !important;
+}
+
+.recharts-legend-wrapper {
+  z-index: 100 !important;
+}
+
+/* Ensure buttons and interactive elements are clickable */
+button, .clickable {
+  position: relative;
+  z-index: 2;
+}
+
+/* Fix for cards that might overlap */
+.dashboard-card {
+  position: relative;
+  z-index: 1;
+  contain: layout;
+}
+
+.dashboard-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure proper spacing and prevent overflow */
+.component-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix for animation elements that might escape */
+.animate-element {
+  position: relative;
+  z-index: 1;
+  contain: layout style;
+}
+
+/* Specific fix for WorldMap SVG */
+.world-map-svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Fix for dropdown menus and tooltips */
+.dropdown-menu,
+.tooltip,
+.popover {
+  z-index: 1000 !important;
+  position: absolute;
+}
+
+/* Ensure search suggestions appear above everything */
+.search-suggestions {
+  z-index: 50 !important;
+  position: absolute;
+}
+
+/* Fix for responsive grid issues */
+.responsive-grid {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Prevent horizontal scroll on main container */
+.app-container {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Fix for activity list that might grow too large */
+.activity-list {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Ensure proper spacing in tight layouts */
+.compact-spacing > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Fix for performance charts overlapping */
+.chart-container {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-container .recharts-wrapper {
+  overflow: hidden !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}

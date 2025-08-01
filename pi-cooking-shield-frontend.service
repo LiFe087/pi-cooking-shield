@@ -1,0 +1,27 @@
+[Unit]
+Description=PI-Cooking-Shield Frontend Server
+Documentation=https://github.com/LiFe087/pi-cooking-shield
+After=network.target pi-cooking-shield.service
+Wants=network.target
+Requires=pi-cooking-shield.service
+
+[Service]
+Type=simple
+User=life
+Group=life
+WorkingDirectory=/home/life/pi-cooking-shield/frontend
+ExecStart=/usr/bin/python3 -m http.server 3000 --bind 192.168.101.4 --directory build
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+ReadOnlyPaths=/home/life/pi-cooking-shield/frontend/build
+
+# Environment variables
+Environment=PYTHONPATH=/home/life/pi-cooking-shield
+
+[Install]
+WantedBy=multi-user.target

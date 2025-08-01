@@ -1,0 +1,33 @@
+[Unit]
+Description=PI-Cooking-Shield Security Monitor
+Documentation=https://github.com/LiFe087/pi-cooking-shield
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=life
+Group=life
+WorkingDirectory=/home/life/pi-cooking-shield/backend
+Environment=PATH=/home/life/pi-cooking-shield/backend/venv/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/life/pi-cooking-shield/backend/venv/bin/python /home/life/pi-cooking-shield/backend/run.py
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings  
+NoNewPrivileges=false
+ReadWritePaths=/home/life/pi-cooking-shield
+ReadWritePaths=/var/log
+ReadWritePaths=/tmp
+
+# Environment variables
+Environment=PYTHONPATH=/home/life/pi-cooking-shield/backend
+Environment=FLASK_ENV=production
+
+[Install]
+WantedBy=multi-user.target
